@@ -1,0 +1,49 @@
+# QueryPilot AI - theme
+# Colors/typography are set through Streamlit's official theming system rather
+# than CSS overrides, so native widgets stay consistent across versions.
+#
+# Elevation ladder (deliberately narrow, so contrast stays subtle):
+#   #08090B  page          #0D0F12  sidebar / input
+#   #111318  cards         #151821  raised (table headers, hover)
+
+[theme]
+base = "dark"
+
+primaryColor             = "#7C6CFF"
+backgroundColor          = "#08090B"
+secondaryBackgroundColor = "#111318"
+textColor                = "#F5F7FA"
+linkColor                = "#A79BFF"
+borderColor              = "#242832"
+dataframeBorderColor     = "#242832"
+dataframeHeaderBackgroundColor = "#151821"
+codeBackgroundColor      = "#0D0F12"
+
+showWidgetBorder = true
+baseRadius   = "0.5rem"
+buttonRadius = "0.5rem"
+baseFontSize = 15
+
+font        = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif"
+headingFont = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif"
+codeFont    = "'JetBrains Mono', 'SF Mono', 'Cascadia Code', Consolas, Menlo, monospace"
+
+# Violet-led ramp, stepped rather than rainbow.
+chartCategoricalColors = [
+    "#7C6CFF", "#9B8FFF", "#B9B0FF", "#5B49E0",
+    "#35C98B", "#5FD6A5", "#6E8BFF", "#7B8496",
+]
+chartSequentialColors = [
+    "#15162B", "#1E1F40", "#2A2A55", "#37346B",
+    "#453F87", "#5449A6", "#6A5DD2", "#8477FF",
+    "#A99FFF", "#CFC9FF",
+]
+
+[theme.sidebar]
+backgroundColor          = "#0D0F12"
+secondaryBackgroundColor = "#111318"
+borderColor              = "#1C2029"
+showWidgetBorder = false
+
+[browser]
+gatherUsageStats = false
