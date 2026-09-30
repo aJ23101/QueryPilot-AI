@@ -53,21 +53,12 @@ st.markdown(f"<style>{load_css()}</style>", unsafe_allow_html=True)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-SAMPLE_QUESTIONS = [
+# Shown as clickable cards under the hero input. Each one is answerable from the
+# bundled schema (customers / products / orders / order_items) — no stores table.
+EXAMPLE_QUERIES = [
     "Who are the top 5 customers by total spend?",
     "Which product category generates the most revenue?",
     "What is the average order value by country?",
-    "Which customers placed more than 2 orders?",
-    "Which products have the highest sales?",
-    "Show me monthly revenue trends",
-]
-
-WORKFLOW = [
-    "Your question",
-    "Schema understanding",
-    "SQL generation",
-    "Query execution",
-    "Data insight",
 ]
 
 # Order the activity trace follows, with the label shown once a step completes.
@@ -317,7 +308,7 @@ def maybe_chart(df: pd.DataFrame) -> None:
         st.bar_chart(
             df.set_index(label_col)[value_col],
             horizontal=True,
-            use_container_width=True,
+            width="stretch",
         )
 
 
@@ -345,7 +336,7 @@ def render_results(df: pd.DataFrame | None, fallback_text: str) -> None:
         return
 
     st.markdown('<div class="qp-block-label">Results</div>', unsafe_allow_html=True)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
     st.markdown(
         f'<div class="qp-rowcount">{fmt_int(len(df))} '
         f'{"row" if len(df) == 1 else "rows"} · {len(df.columns)} columns</div>',
@@ -529,7 +520,7 @@ with st.sidebar:
         st.caption("No tables found in this database.")
 
     st.divider()
-    if st.button("Clear conversation", use_container_width=True):
+    if st.button("Clear conversation", width="stretch"):
         st.session_state["messages"] = []
         st.rerun()
 
@@ -547,10 +538,7 @@ st.markdown(
     '<div class="qp-header">'
     '  <div class="qp-brand">'
     '    <div class="qp-logo">&#128270;</div>'
-    "    <div>"
-    '      <div class="qp-brand-name">QueryPilot AI</div>'
-    '      <div class="qp-brand-sub">AI-Powered Data Analyst</div>'
-    "    </div>"
+    '    <div class="qp-brand-name">QueryPilot AI</div>'
     "  </div>"
     '  <div class="qp-header-right">'
     '    <span class="qp-pill qp-pill--live"><span class="qp-dot"></span>Connected</span>'
@@ -564,52 +552,61 @@ st.markdown(
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-# Resolve the pending question up front. st.chat_input always pins to the bottom
-# of the viewport regardless of where it is called, so reading it here lets the
-# hero disappear on the same run that answers the first question.
-question: str | None = st.chat_input("Ask QueryPilot about your data...")
-if "pending_q" in st.session_state:
-    question = st.session_state.pop("pending_q")
+# A question queued by an example card or by the hero's own input.
+question: str | None = st.session_state.pop("pending_q", None)
+
+# The hero owns the input until a conversation exists; after that the input
+# pins to the bottom of the viewport in the usual chat position.
+show_hero = not st.session_state["messages"] and not question
 
 # ── Hero / empty state ─────────────────────────────────────────────────────────
 
-if not st.session_state["messages"] and not question:
-    flow = f'<span class="qp-flow-arrow">&#8594;</span>'.join(
-        f'<span class="qp-flow-step">{esc(s)}</span>' for s in WORKFLOW
-    )
+if show_hero:
     st.markdown(
         '<div class="qp-hero">'
         '  <div class="qp-hero-mark">&#128270;</div>'
         '  <h1 class="qp-hero-brand">QueryPilot AI</h1>'
-        '  <div class="qp-hero-tagline">Ask your data anything.</div>'
-        '  <p class="qp-hero-sub">Ask questions in plain English. QueryPilot '
-        "inspects your database, writes the SQL, executes it, and explains the "
-        "result.</p>"
-        f'  <div class="qp-flow">{flow}</div>'
+        '  <p class="qp-hero-subtitle">Natural language analytics for SQL '
+        "databases</p>"
+        '  <p class="qp-hero-desc">Query databases in plain English, inspect the '
+        "generated SQL, and trace how each answer was produced.</p>"
         "</div>",
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="qp-section-label">Start with an example</div>',
+    # Nesting chat_input in a container renders it inline instead of pinned.
+    with st.container(key="qp-hero-input"):
+        typed = st.chat_input(
+            "Ask a question about your database...", key="qp_hero_input"
+        )
+
+    st.markdown('<div class="qp-section-label">Try a query</div>',
                 unsafe_allow_html=True)
 
-    left, right = st.columns(2, gap="small")
-    for i, q in enumerate(SAMPLE_QUESTIONS):
-        target = left if i % 2 == 0 else right
-        with target:
-            if st.button(q, key=f"qp-example-{i}", use_container_width=True):
+    cols = st.columns(3, gap="small")
+    for i, (col, q) in enumerate(zip(cols, EXAMPLE_QUERIES)):
+        with col:
+            if st.button(q, key=f"qp-example-{i}", width="stretch"):
                 st.session_state["pending_q"] = q
                 st.rerun()
 
+    if typed:
+        st.session_state["pending_q"] = typed
+        st.rerun()
+
 # ── Chat history ───────────────────────────────────────────────────────────────
 
-for msg in st.session_state["messages"]:
-    if msg["role"] == "user":
-        with st.chat_message("user", avatar="👤"):
-            st.markdown(md_safe(msg["content"]))
-    else:
-        with st.chat_message("assistant", avatar="🔎"):
-            render_answer(msg)
+else:
+    for msg in st.session_state["messages"]:
+        if msg["role"] == "user":
+            with st.chat_message("user", avatar="👤"):
+                st.markdown(md_safe(msg["content"]))
+        else:
+            with st.chat_message("assistant", avatar="🔎"):
+                render_answer(msg)
+
+    typed = st.chat_input("Ask QueryPilot about your data...", key="qp_chat_input")
+    question = question or typed
 
 # ── Run the pending question ───────────────────────────────────────────────────
 

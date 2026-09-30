@@ -12,15 +12,15 @@
     /* Elevation ladder — narrow on purpose, so layers read as depth not stripes */
     --qp-bg:            #08090B;   /* page                     */
     --qp-sunken:        #0D0F12;   /* sidebar, input, code      */
-    --qp-surface:       #111318;   /* cards, panels             */
-    --qp-surface-hi:    #171A21;   /* hover, raised             */
+    --qp-surface:       #101217;   /* cards, panels             */
+    --qp-surface-hi:    #161922;   /* hover, raised             */
 
     --qp-border:        #242832;
     --qp-border-soft:   #1B1F27;
     --qp-border-input:  #2A2F3A;
 
     --qp-text:          #F5F7FA;
-    --qp-text-dim:      #9299A6;
+    --qp-text-dim:      #A0A6B2;
     --qp-text-faint:    #646B78;
 
     --qp-accent:        #7C6CFF;
@@ -30,6 +30,9 @@
     --qp-accent-ring:   rgba(124, 108, 255, 0.14);
 
     --qp-ok:            #35C98B;
+
+    /* One content width shared by the top bar, hero and results. */
+    --qp-content: 960px;
 
     --qp-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', Consolas, Menlo, monospace;
 }
@@ -85,9 +88,9 @@
 [data-testid="stBottomBlockContainer"] { position: relative; z-index: 1; }
 
 [data-testid="stMainBlockContainer"] {
-    padding-top: 2.2rem;
-    padding-bottom: 7rem;
-    max-width: 1180px;
+    padding-top: 1.6rem;
+    padding-bottom: 5rem;
+    max-width: var(--qp-content);
 }
 
 /* ── Top header ────────────────────────────────────────────────────────── */
@@ -96,35 +99,38 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
     flex-wrap: wrap;
-    padding: 0 0 1.05rem 0;
+    gap: 0.6rem 1rem;
+    width: 100%;
+    max-width: var(--qp-content);
+    margin: 0 auto 2.6rem;
+    padding-bottom: 0.9rem;
     border-bottom: 1px solid var(--qp-border-soft);
-    margin-bottom: 1.4rem;
 }
 
-.qp-brand { display: flex; align-items: center; gap: 0.72rem; min-width: 0; }
+.qp-brand { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
 
 .qp-logo {
-    width: 34px;
-    height: 34px;
-    flex: 0 0 34px;
-    border-radius: 9px;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: 8px;
     display: grid;
     place-items: center;
     background: var(--qp-accent-wash);
     border: 1px solid var(--qp-accent-edge);
     color: var(--qp-accent-soft);
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1;
 }
 
 .qp-brand-name {
-    font-size: 1.12rem;
-    font-weight: 700;
-    letter-spacing: -0.018em;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.012em;
     color: var(--qp-text);
     line-height: 1.2;
+    white-space: nowrap;
 }
 
 .qp-brand-sub {
@@ -180,117 +186,141 @@
 
 /* ── Hero ──────────────────────────────────────────────────────────────── */
 
+/*  One centred composition. Every child shares --qp-content as its boundary,
+    so the heading, copy, input and example cards line up on the same edges.
+    Vertical rhythm is set deliberately rather than inherited from Streamlit.  */
 .qp-hero {
+    max-width: var(--qp-content);
+    margin: 0 auto;
+    padding: 4.2vh 0 0;
     text-align: center;
-    padding: 3.6rem 1rem 1.4rem;
 }
 
-/* Brand mark above the wordmark */
 .qp-hero-mark {
-    width: 62px;
-    height: 62px;
-    margin: 0 auto 1.35rem;
-    border-radius: 16px;
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 20px;          /* icon -> heading */
+    border-radius: 12px;
     display: grid;
     place-items: center;
-    font-size: 27px;
+    font-size: 21px;
     line-height: 1;
     background: var(--qp-surface);
-    border: 1px solid var(--qp-accent-edge);
-    box-shadow:
-        0 0 0 7px rgba(124, 108, 255, 0.045),
-        0 16px 42px -18px rgba(124, 108, 255, 0.5);
+    border: 1px solid var(--qp-border);
+    box-shadow: 0 0 0 5px rgba(124, 108, 255, 0.05);
 }
 
-/* Product name — the strongest element on the page.
-   Sized in px, not rem: Streamlit's baseFontSize does not move the root font
-   size, so rem-based clamps resolve smaller than intended. */
-/* Streamlit's own `h1` rule is more specific than a bare class, so the size
-   and weight are forced here; without this the wordmark falls back to 41px. */
+/* Product name. Streamlit's own `h1` rule is more specific than a bare class,
+   so size and weight are forced here. */
 .qp-hero h1.qp-hero-brand {
-    font-size: 40px !important;
-    font-weight: 780 !important;
-    letter-spacing: -0.035em;
-    line-height: 1.04;
+    font-size: 52px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.032em;
+    line-height: 1.05;
     color: var(--qp-text);
-    margin: 0 0 0.62rem;
+    margin: 0 0 12px !important;   /* heading -> subtitle */
     padding: 0;
 }
 
-@media (min-width: 720px)  { .qp-hero h1.qp-hero-brand { font-size: 48px !important; } }
-@media (min-width: 1100px) { .qp-hero h1.qp-hero-brand { font-size: 54px !important; } }
-
-/* Tagline — deliberately well below the wordmark in size and weight */
-.qp-hero-tagline {
-    font-size: 17px;
-    font-weight: 500;
-    letter-spacing: -0.012em;
-    color: #C6CCD8;
-    margin: 0 0 0.95rem;
+/* Same specificity problem as the h1: Streamlit's own `p` rule inside a
+   markdown container outranks a bare class, so these are forced. */
+.qp-hero p.qp-hero-subtitle {
+    font-size: 22px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.014em;
+    line-height: 1.32;
+    color: var(--qp-text);
+    margin: 0 auto 16px !important;  /* subtitle -> description */
+    max-width: 720px;
 }
 
-@media (min-width: 720px) { .qp-hero-tagline { font-size: 20px; } }
-
-.qp-hero-sub {
-    font-size: 0.95rem;
-    line-height: 1.65;
+.qp-hero p.qp-hero-desc {
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.6;
     color: var(--qp-text-dim);
-    max-width: 560px;
-    margin: 0 auto;
-}
-
-/* Workflow strip: question -> schema -> SQL -> execution -> insight */
-.qp-flow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.44rem;
-    margin: 2.3rem auto 0;
-}
-
-.qp-flow-step {
-    font-size: 0.735rem;
-    font-weight: 500;
-    color: var(--qp-text-dim);
-    background: var(--qp-surface);
-    border: 1px solid var(--qp-border-soft);
-    border-radius: 6px;
-    padding: 0.32rem 0.62rem;
-    white-space: nowrap;
-}
-
-.qp-flow-arrow {
-    color: var(--qp-text-faint);
-    font-size: 0.72rem;
+    max-width: 650px;
+    margin: 0 auto !important;
+    padding: 0 0 30px;               /* description -> input */
 }
 
 .qp-section-label {
-    font-size: 0.715rem;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.075em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--qp-text-faint);
-    margin: 2.6rem 0 0.9rem;
+    text-align: center;
+    margin: 22px 0 10px;             /* input -> examples */
+}
+
+/* ── Hero query input ──────────────────────────────────────────────────── */
+
+/*  st.chat_input renders inline when nested in a container, which is what puts
+    it inside the hero instead of pinned to the bottom of the viewport.        */
+.st-key-qp-hero-input {
+    max-width: var(--qp-content);
+    margin: 0 auto;
+}
+
+.st-key-qp-hero-input [data-testid="stChatInput"] {
+    background: var(--qp-surface);
+    border: 1px solid var(--qp-border-input);
+    border-radius: 12px;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    position: relative;
+}
+
+/* Search glyph. Drawn as an overlay rather than a container background,
+   because Streamlit's inner input wrapper paints over the container. */
+.st-key-qp-hero-input [data-testid="stChatInput"]::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 17px;
+    height: 17px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717%27%20height%3D%2717%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%237A818F%27%20stroke-width%3D%272.1%27%20stroke-linecap%3D%27round%27%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%2711%27%20r%3D%277%27%2F%3E%3Cline%20x1%3D%2716.5%27%20y1%3D%2716.5%27%20x2%3D%2721%27%20y2%3D%2721%27%2F%3E%3C%2Fsvg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.st-key-qp-hero-input [data-testid="stChatInput"] textarea {
+    padding-left: 30px;
+    font-size: 15px;
+    min-height: 26px;
+}
+
+.st-key-qp-hero-input [data-testid="stChatInput"]:hover {
+    border-color: #333947;
+}
+
+.st-key-qp-hero-input [data-testid="stChatInput"]:focus-within {
+    border-color: rgba(124, 108, 255, 0.55);
+    box-shadow: 0 0 0 3px var(--qp-accent-ring);
 }
 
 /* ── Example prompt cards ──────────────────────────────────────────────── */
 
 [class*="st-key-qp-example-"] button {
     width: 100%;
-    min-height: 64px;
+    height: 100%;
+    min-height: 60px;
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center;
-    padding: 0.82rem 1rem !important;
+    padding: 0.7rem 0.85rem !important;
     background: var(--qp-surface) !important;
     border: 1px solid var(--qp-border) !important;
+    border-radius: 10px !important;
     color: var(--qp-text-dim) !important;
-    font-size: 0.87rem !important;
+    font-size: 13.5px !important;
     font-weight: 450 !important;
-    line-height: 1.45;
-    transition: background 150ms ease, border-color 150ms ease,
-                color 150ms ease, transform 150ms ease;
+    line-height: 1.4;
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 /* Streamlit wraps button labels in nested flex nodes that centre the text;
@@ -319,6 +349,17 @@
 [class*="st-key-qp-example-"] button:focus-visible {
     border-color: var(--qp-accent) !important;
     box-shadow: 0 0 0 3px var(--qp-accent-ring) !important;
+}
+
+/* Equal-height cards regardless of how the label wraps. The column already
+   stretches; the vertical block and element wrapper inside it do not, so they
+   are stretched here too — scoped with :has() so other columns are untouched. */
+[class*="st-key-qp-example-"] { height: 100%; }
+
+[class*="st-key-qp-example-"] [data-testid="stButton"] { height: 100%; }
+
+[data-testid="stVerticalBlock"]:has(> [class*="st-key-qp-example-"]) {
+    height: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -616,13 +657,23 @@
 
 /* ── Narrow screens ────────────────────────────────────────────────────── */
 
+@media (max-width: 1080px) {
+    .qp-hero h1.qp-hero-brand { font-size: 46px !important; }
+    .qp-hero p.qp-hero-subtitle { font-size: 20px !important; }
+}
+
 @media (max-width: 760px) {
-    .qp-header { gap: 0.7rem; }
-    .qp-header-right { width: 100%; }
-    .qp-hero { padding-top: 2.4rem; }
-    .qp-hero-mark { width: 54px; height: 54px; font-size: 23px; margin-bottom: 1.1rem; }
-    .qp-flow { gap: 0.3rem; }
-    .qp-flow-arrow { display: none; }
-    [data-testid="stMainBlockContainer"] { padding-bottom: 6rem; }
+    .qp-header {
+        gap: 0.6rem;
+        margin-bottom: 1.8rem;
+    }
+    .qp-header-right { width: 100%; justify-content: flex-start; }
+    .qp-brand { flex: 1 1 100%; }
+    .qp-hero { padding-top: 2.4vh; }
+    .qp-hero-mark { width: 42px; height: 42px; font-size: 19px; margin-bottom: 16px; }
+    .qp-hero h1.qp-hero-brand { font-size: 34px !important; }
+    .qp-hero p.qp-hero-subtitle { font-size: 17px !important; }
+    .qp-hero p.qp-hero-desc { font-size: 14px !important; padding-bottom: 24px; }
+    [data-testid="stMainBlockContainer"] { padding-bottom: 4rem; }
     [data-testid="stAppViewContainer"]::after { display: none; }
 }
